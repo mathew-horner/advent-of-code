@@ -5,6 +5,7 @@
 pub mod date;
 pub mod input;
 pub mod solutions;
+mod util;
 
 // Re-export for convenient references from solutions (`crate::Input`)
 pub use input::Input;
