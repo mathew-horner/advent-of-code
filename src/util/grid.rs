@@ -10,11 +10,16 @@ pub struct Grid<T> {
 impl<T: ParseCell> Grid<T> {
     /// Read the input and output a 2D array of `T` with each cell parsed as the type `T`.
     pub fn parse(input: crate::Input) -> Self {
-        Self { data: input.read_lines().map(|line| line.chars().map(T::parse_cell).collect()).collect() }
+        Self { data: input.read_lines().map(|line| line.trim().chars().map(T::parse_cell).collect()).collect() }
     }
 }
 
 impl<T> Grid<T> {
+    /// Return a reference to the grid's raw data.
+    pub fn data(&self) -> &Vec<Vec<T>> {
+        &self.data
+    }
+
     /// Return all [`Cell`]s that match the given condition.
     pub fn find_all<'a>(&'a self, f: impl Fn(&T) -> bool) -> impl Iterator<Item = Cell<'a, T>> {
         self.data
@@ -38,7 +43,7 @@ impl<T> Grid<T> {
         Some(Cell { grid: self, data: CellData { position, value } })
     }
 
-    fn get_with_signed_coords<'a>(&'a self, coords: GridCoords<i32>) -> Option<Cell<'a, T>> {
+    pub fn get_with_signed_coords<'a>(&'a self, coords: GridCoords<i32>) -> Option<Cell<'a, T>> {
         if coords.row < 0 || coords.col < 0 {
             return None;
         }
@@ -121,7 +126,7 @@ where
     /// Return new `GridCoords` with the `offset` applied.
     ///
     /// This function assumes that the given coords can be converted to `i32`.
-    fn with_offset(self, offset: GridCoords<i32>) -> GridCoords<i32> {
+    pub fn with_offset(self, offset: GridCoords<i32>) -> GridCoords<i32> {
         GridCoords {
             row: self.row.try_into().ok().unwrap() + offset.row,
             col: self.col.try_into().ok().unwrap() + offset.col,
@@ -141,5 +146,11 @@ pub trait ParseCell {
 impl ParseCell for u32 {
     fn parse_cell(cell: char) -> Self {
         cell.to_digit(10).unwrap()
+    }
+}
+
+impl ParseCell for char {
+    fn parse_cell(cell: char) -> Self {
+        cell
     }
 }
