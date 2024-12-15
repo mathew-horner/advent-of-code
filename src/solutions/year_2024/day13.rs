@@ -47,7 +47,9 @@ fn min_tokens(config: Config) -> Option<u64> {
     // We solve for b, then use that result to solve for a.
     //
     // Given the problem description, we only count solutions where a and b are whole numbers.
-    let b = -divide(ty * xa - ya * tx, ya * xb - yb * xa)?;
+    let bn = ty * xa - ya * tx;
+    let bd = ya * xb - yb * xa;
+    let b = -divide(bn, bd).unwrap_or(0);
     let a = divide(tx - b * xb, xa)?;
     Some((a * 3 + b) as u64)
 }
@@ -89,5 +91,10 @@ Prize: X=8400, Y=5400
         );
 
         assert_eq!(min_tokens(config), Some(280));
+    }
+
+    #[test]
+    fn multiple_solutions() {
+        println!("{:?}", min_tokens(Config { a: (1, 1), b: (2, 2), prize_location: (100, 100) }));
     }
 }
