@@ -9,7 +9,7 @@ fn solve(input: crate::Input) -> (usize, usize) {
     let mut seen = HashSet::new();
     for (row, values) in grid.data().into_iter().enumerate() {
         for (col, &value) in values.into_iter().enumerate() {
-            let coords = GridCoords::new(row, col);
+            let coords = GridCoords { row, col };
             if seen.contains(&coords) {
                 continue;
             }
@@ -19,7 +19,7 @@ fn solve(input: crate::Input) -> (usize, usize) {
             let mut queue = VecDeque::from_iter(std::iter::once(coords));
             let mut oob = HashSet::new();
             while let Some(position) = queue.pop_back() {
-                for offset in [(1, 0), (0, 1), (-1, 0), (0, -1)].map(|(row, col)| GridCoords::new(row, col)) {
+                for offset in [(1, 0), (0, 1), (-1, 0), (0, -1)].map(|(row, col)| GridCoords { row, col }) {
                     let offset_pos = position.with_offset(offset);
                     match grid.get_with_signed_coords(offset_pos) {
                         Some(cell) if *cell.data.value == value => {
@@ -49,10 +49,10 @@ fn solve(input: crate::Input) -> (usize, usize) {
                 let mut on_edge_left = false;
                 let mut on_edge_right = false;
                 for row in start_row..=end_row {
-                    let in_region = positions.contains(&GridCoords::new(row, col));
-                    let empty_right = !positions.contains(&GridCoords::new(row, col + 1));
+                    let in_region = positions.contains(&GridCoords { row, col });
+                    let empty_right = !positions.contains(&GridCoords { row, col: col + 1 });
                     let empty_left =
-                        (col > 0).then(|| !positions.contains(&GridCoords::new(row, col - 1))).unwrap_or(true);
+                        (col > 0).then(|| !positions.contains(&GridCoords { row, col: col - 1 })).unwrap_or(true);
                     let next_on_edge_left = in_region && empty_left;
                     let next_on_edge_right = in_region && empty_right;
                     if !next_on_edge_left && on_edge_left {
